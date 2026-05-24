@@ -1,0 +1,36 @@
+{
+  "name": "pappu",
+  "version": "1.0.0",
+  "description": "Funny Hinglish AI Discord bot powered by Gemini. Dry humor, savage replies, server-aware memory, Indian internet energy, and chaotic late-night VC personality.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --watch . --ext ts -exec tsx index.js",
+    "start": "tsx index.js"
+  },
+  "keywords": [
+    "discord-bot",
+    "pappu",
+    "gemini-base",
+    "llm-ai"
+  ],
+  "author": "Pratyush kumar",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratyush0898/pappu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pratyush0898/pappu/issues"
+  },
+  "homepage": "https://github.com/pratyush0898/pappu#readme",
+  "dependencies": {
+    "@google/genai": "^2.6.0",
+    "@types/node": "^25.9.1",
+    "discord.js": "^14.26.4",
+    "dotenv": "^17.4.2",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}

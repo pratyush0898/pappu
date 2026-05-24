@@ -1,0 +1,51 @@
+# dependencies
+node_modules/
+
+# env
+.env
+.env.local
+.env.production
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# runtime
+data/
+memory/
+cache/
+sessions/
+
+# build
+dist/
+build/
+out/
+
+# typescript
+*.tsbuildinfo
+
+# editor
+.vscode/
+.idea/
+
+# system
+.DS_Store
+Thumbs.db
+
+# temporary
+tmp/
+temp/
+
+# bot junk
+*.sqlite
+*.db
+*.json.bak
+
+# vercel
+.vercel/
+
+# misc
+coverage/
