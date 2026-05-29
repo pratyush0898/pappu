@@ -1,0 +1,560 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Pappu Analytics</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, sans-serif;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: white;
+      padding: 24px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    .sub {
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    select {
+      background: #141414;
+      color: white;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 12px;
+      min-width: 180px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(220px, 1fr)
+        );
+
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .big {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-box {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 18px;
+      padding: 20px;
+      height: 360px;
+    }
+
+    .tables {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .table-box {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid #222;
+    }
+
+    th {
+      color: #888;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    tr:hover {
+      background: #1b1b1b;
+    }
+
+    @media (max-width: 900px) {
+      .charts,
+      .tables {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top">
+    <div>
+      <h1>Pappu Analytics</h1>
+
+      <div class="sub">
+        unemployed AI surveillance dashboard 😭
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+
+    <select id="timeframe">
+      <option value="24h">
+        Past 24 Hours
+      </option>
+
+      <option value="7d">
+        Past 7 Days
+      </option>
+
+      <option value="30d">
+        Past 30 Days
+      </option>
+
+      <option value="today">
+        Today (IST)
+      </option>
+    </select>
+
+    <select id="guild">
+      <option value="">
+        All Servers
+      </option>
+    </select>
+
+    <select id="user">
+      <option value="">
+        All Users
+      </option>
+    </select>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Total Tokens</h2>
+      <div class="big" id="tokens">0</div>
+    </div>
+
+    <div class="card">
+      <h2>Total Requests</h2>
+      <div class="big" id="requests">0</div>
+    </div>
+
+    <div class="card">
+      <h2>Total Users</h2>
+      <div class="big" id="users">0</div>
+    </div>
+
+    <div class="card">
+      <h2>Total Servers</h2>
+      <div class="big" id="servers">0</div>
+    </div>
+
+  </div>
+
+  <div class="charts">
+
+    <div class="chart-box">
+      <canvas id="usageChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <canvas id="serverChart"></canvas>
+    </div>
+
+  </div>
+
+  <div class="tables">
+
+    <div class="table-box">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Top Users</th>
+            <th>Tokens</th>
+          </tr>
+        </thead>
+
+        <tbody id="topUsers"></tbody>
+
+      </table>
+
+    </div>
+
+    <div class="table-box">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Top Channels</th>
+            <th>Tokens</th>
+          </tr>
+        </thead>
+
+        <tbody id="topChannels"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+  <div class="table-box">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Server</th>
+          <th>Channel</th>
+          <th>Tokens</th>
+          <th>Time (IST)</th>
+        </tr>
+      </thead>
+
+      <tbody id="logs"></tbody>
+
+    </table>
+
+  </div>
+
+  <script>
+
+    let usageChart;
+    let serverChart;
+
+    async function load() {
+
+      const timeframe =
+        document.getElementById(
+          "timeframe"
+        ).value;
+
+      const guildId =
+        document.getElementById(
+          "guild"
+        ).value;
+
+      const userId =
+        document.getElementById(
+          "user"
+        ).value;
+
+      const res =
+        await fetch(
+          `/pappu/api/stats?timeframe=${timeframe}&guildId=${guildId}&userId=${userId}`
+        );
+
+      const data =
+        await res.json();
+
+      document.getElementById(
+        "tokens"
+      ).innerText =
+        data.stats.totalTokens.toLocaleString();
+
+      document.getElementById(
+        "requests"
+      ).innerText =
+        data.stats.totalRequests;
+
+      document.getElementById(
+        "users"
+      ).innerText =
+        data.stats.totalUsers;
+
+      document.getElementById(
+        "servers"
+      ).innerText =
+        data.stats.totalServers;
+
+      const logs =
+        document.getElementById(
+          "logs"
+        );
+
+      logs.innerHTML = "";
+
+      data.logs.forEach(log => {
+
+        logs.innerHTML += `
+          <tr>
+            <td>${log.username}</td>
+            <td>${log.guild_name}</td>
+            <td>#${log.channel_name}</td>
+            <td>${log.total_tokens}</td>
+            <td>
+              ${new Date(log.created_at).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata"
+              })}
+            </td>
+          </tr>
+        `;
+
+      });
+
+      const topUsers =
+        document.getElementById(
+          "topUsers"
+        );
+
+      topUsers.innerHTML = "";
+
+      data.topUsers.forEach(user => {
+
+        topUsers.innerHTML += `
+          <tr>
+            <td>${user.username}</td>
+            <td>${user.tokens}</td>
+          </tr>
+        `;
+
+      });
+
+      const topChannels =
+        document.getElementById(
+          "topChannels"
+        );
+
+      topChannels.innerHTML = "";
+
+      data.topChannels.forEach(channel => {
+
+        topChannels.innerHTML += `
+          <tr>
+            <td>#${channel.channel_name}</td>
+            <td>${channel.tokens}</td>
+          </tr>
+        `;
+
+      });
+
+      const guildSelect =
+        document.getElementById(
+          "guild"
+        );
+
+      if (
+        guildSelect.options.length === 1
+      ) {
+
+        data.guilds.forEach(guild => {
+
+          guildSelect.innerHTML += `
+            <option value="${guild.guild_id}">
+              ${guild.guild_name}
+            </option>
+          `;
+
+        });
+
+      }
+
+      const userSelect =
+        document.getElementById(
+          "user"
+        );
+
+      if (
+        userSelect.options.length === 1
+      ) {
+
+        data.users.forEach(user => {
+
+          userSelect.innerHTML += `
+            <option value="${user.user_id}">
+              ${user.username}
+            </option>
+          `;
+
+        });
+
+      }
+
+      if (usageChart) {
+        usageChart.destroy();
+      }
+
+      if (serverChart) {
+        serverChart.destroy();
+      }
+
+      usageChart = new Chart(
+        document.getElementById(
+          "usageChart"
+        ),
+        {
+          type: "line",
+
+          data: {
+            labels:
+              data.usageChart.map(
+                x => x.label
+              ),
+
+            datasets: [
+              {
+                label: "Token Usage",
+
+                data:
+                  data.usageChart.map(
+                    x => x.tokens
+                  ),
+
+                borderWidth: 2,
+                tension: 0.4,
+              }
+            ]
+          },
+
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          }
+        }
+      );
+
+      serverChart = new Chart(
+        document.getElementById(
+          "serverChart"
+        ),
+        {
+          type: "bar",
+
+          data: {
+            labels:
+              data.serverChart.map(
+                x => x.guild_name
+              ),
+
+            datasets: [
+              {
+                label: "Server Tokens",
+
+                data:
+                  data.serverChart.map(
+                    x => x.tokens
+                  ),
+
+                borderWidth: 1,
+              }
+            ]
+          },
+
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          }
+        }
+      );
+
+    }
+
+    document
+      .getElementById(
+        "timeframe"
+      )
+      .addEventListener(
+        "change",
+        load
+      );
+
+    document
+      .getElementById(
+        "guild"
+      )
+      .addEventListener(
+        "change",
+        load
+      );
+
+    document
+      .getElementById(
+        "user"
+      )
+      .addEventListener(
+        "change",
+        load
+      );
+
+    load();
+
+  </script>
+
+</body>
+</html>
