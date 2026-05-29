@@ -71,6 +71,13 @@ CREATE TABLE IF NOT EXISTS usage_logs (
 )
 `);
 
+db.exec(`
+CREATE TABLE IF NOT EXISTS guild_settings (
+  guild_id TEXT PRIMARY KEY,
+  prompt TEXT DEFAULT ''
+)
+`);
+
 const INVITE_FILE =
   "guild-invites.json";
 
@@ -429,11 +436,113 @@ client.on(
   }
 );
 
+function getGuildPrompt(
+  guildId: string
+) {
+  const row = db.prepare(`
+    SELECT prompt
+    FROM guild_settings
+    WHERE guild_id = ?
+  `).get(guildId) as
+    | { prompt: string }
+    | undefined;
+
+  return row?.prompt || "";
+}
+
+function setGuildPrompt(
+  guildId: string,
+  prompt: string
+) {
+  db.prepare(`
+    INSERT INTO guild_settings (
+      guild_id,
+      prompt
+    )
+    VALUES (?, ?)
+    ON CONFLICT(guild_id)
+    DO UPDATE SET
+      prompt = excluded.prompt
+  `).run(
+    guildId,
+    prompt
+  );
+}
+
 client.on(
   Events.MessageCreate,
   async (message) => {
     if (message.author.bot)
       return;
+
+    if (
+      message.content.startsWith(
+        "!guild prompt "
+      )
+    ) {
+      if (
+        !message.member?.permissions.has(
+          "Administrator"
+        )
+      ) {
+        return message.reply(
+          "admin la bhai 😭"
+        );
+      }
+
+      const args =
+        message.content.slice(
+          "!guild prompt ".length
+        );
+
+      if (
+        args === "view"
+      ) {
+        const prompt =
+          getGuildPrompt(
+            message.guild!.id
+          );
+
+        return message.reply(
+          prompt ||
+            "guild prompt empty 👍"
+        );
+      }
+
+      if (
+        args === "clear"
+      ) {
+        setGuildPrompt(
+          message.guild!.id,
+          ""
+        );
+
+        return message.reply(
+          "guild prompt cleared 👍"
+        );
+      }
+
+      if (
+        args.startsWith(
+          "set "
+        )
+      ) {
+        const prompt =
+          args
+            .slice(4)
+            .trim()
+            .slice(0, 500);
+
+        setGuildPrompt(
+          message.guild!.id,
+          prompt
+        );
+
+        return message.reply(
+          "guild prompt updated 👍"
+        );
+      }
+    }
 
     const replyToBot =
       await isReplyToBot(
@@ -496,6 +605,11 @@ client.on(
           message: `
           SERVER:
           ${message.guild?.name}
+
+          SERVER PROMPT:
+          ${getGuildPrompt(
+            message.guild!.id
+          )}
 
           CHANNEL:
           #${"name" in message.channel ? message.channel.name : "unknown"}
