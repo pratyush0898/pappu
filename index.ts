@@ -5,6 +5,7 @@ import {
   Client,
   Events,
   GatewayIntentBits,
+  PermissionFlagsBits,
 } from "discord.js";
 
 import {
@@ -108,7 +109,7 @@ You are "Pappu" — a funny Hinglish Discord bot.
 
 You are NOT an AI assistant.
 
-You are basically that hilarious Indian internet guy sitting outside a paan shop at 11PM.
+You are basically that hilarious Indian internet guy that mostly like to sit outside a paan shop!.
 
 Your Boss:
 - Pratyush Kumar
@@ -144,6 +145,29 @@ Examples:
 Most important:
 Feel like a REAL Discord member.
 `;
+
+const now = new Date();
+
+const currentTime =
+  now.toLocaleTimeString(
+    "en-IN",
+    {
+      timeZone:
+        "Asia/Kolkata",
+    }
+  );
+
+const currentDate =
+  now.toLocaleDateString(
+    "en-IN",
+    {
+      timeZone:
+        "Asia/Kolkata",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
 
 // ======================================================
 // CHAT SESSIONS
@@ -475,6 +499,138 @@ client.on(
     if (message.author.bot)
       return;
 
+      if (
+        message.content.startsWith(
+          "!steal"
+        )
+      ) {
+        if (!message.guild)
+          return;
+
+        if (
+          !message.guild.members.me?.permissions.has(
+            PermissionFlagsBits.ManageExpressions
+          )
+        ) {
+          return message.reply(
+            "Manage Expressions permission de bhai 😭"
+          );
+        }
+
+        const args =
+          message.content.split(
+            /\s+/
+          );
+
+        // ======================================
+        // Emoji steal
+        // Usage:
+        // !steal <:emoji:id>
+        // ======================================
+
+        if (args[1]) {
+          const match =
+            args[1].match(
+              /^<(a?):([\w-]+):(\d+)>$/
+            );
+
+          if (!match) {
+            return message.reply(
+              "emoji bhej bhai 😭"
+            );
+          }
+
+          const [
+            ,
+            animated,
+            name,
+            id,
+          ] = match;
+
+          const url = `https://cdn.discordapp.com/emojis/${id}.${animated ? "gif" : "png"}?quality=lossless`;
+
+          try {
+            const emoji =
+              await message.guild.emojis.create(
+                {
+                  attachment:
+                    url,
+                  name,
+                }
+              );
+
+            return message.reply(
+              `stealed ${emoji}`
+            );
+          } catch (error) {
+            console.error(
+              "Emoji steal error:",
+              error
+            );
+
+            return message.reply(
+              "emoji chori fail 😭"
+            );
+          }
+        }
+
+        // ======================================
+        // Sticker steal
+        // Reply to sticker message:
+        // !steal
+        // ======================================
+
+        if (
+          message.reference
+            ?.messageId
+        ) {
+          try {
+            const replied =
+              await message.fetchReference();
+
+            const sticker =
+              replied.stickers.first();
+
+            if (!sticker) {
+              return message.reply(
+                "sticker kahan hai 😭"
+              );
+            }
+
+            const created =
+              await message.guild.stickers.create(
+                {
+                  file:
+                    sticker.url,
+                  name:
+                    sticker.name.slice(
+                      0,
+                      30
+                    ),
+                  tags: "👍",
+                }
+              );
+
+            return message.reply(
+              `stealed sticker **${created.name}**`
+            );
+          } catch (error) {
+            console.error(
+              "Sticker steal error:",
+              error
+            );
+
+            return message.reply(
+              "sticker chori fail 😭"
+            );
+          }
+        }
+
+        return message.reply(
+          "Usage:\n!steal <:emoji:id>\nOR reply to a sticker with !steal"
+        );
+      }
+
     if (
       message.content.startsWith(
         "!guild prompt "
@@ -544,6 +700,19 @@ client.on(
       }
     }
 
+    if (
+      message.content === "!clear" ||
+      message.content === "!reset"
+    ) {
+      sessions.delete(
+        `${message.guild?.id}:${message.channel.id}:${message.author.id}`
+      );
+
+      return message.reply(
+        "memory wiped 👍"
+      );
+    }
+
     const replyToBot =
       await isReplyToBot(
         message
@@ -579,19 +748,6 @@ client.on(
       );
     }
 
-    if (
-      content === "!clear" ||
-      content === "!reset"
-    ) {
-      sessions.delete(
-        `${message.guild?.id}:${message.channel.id}:${message.author.id}`
-      );
-
-      return message.reply(
-        "memory wiped 👍"
-      );
-    }
-
     try {
       await message.channel.sendTyping();
 
@@ -613,6 +769,9 @@ client.on(
 
           CHANNEL:
           #${"name" in message.channel ? message.channel.name : "unknown"}
+
+          TIME: ${currentTime}
+          DATE: ${currentDate}
 
           USER:
           ${message.author.username}
