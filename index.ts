@@ -509,7 +509,7 @@ client.on(
 
         if (
           !message.guild.members.me?.permissions.has(
-            PermissionFlagsBits.ManageExpressions
+            PermissionFlagsBits.ManageGuildExpressions
           )
         ) {
           return message.reply(
@@ -869,3 +869,4 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 client.login(
   process.env.DISCORD_TOKEN
 );
+admin@ip-172-31-3-117:~/pappu$ 
